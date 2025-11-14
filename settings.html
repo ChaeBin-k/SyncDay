@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SyncDay</title>
+    <style>
+        /* 1. 기본 스타일 */
+        body {
+            background-color: white;
+            margin: 0;
+            font-family: sans-serif;
+            color: black;
+        }
+
+        /* 2. 상자 공통 스타일 */
+        .box {
+            background-color: white;
+            border: 1px solid black;
+            box-sizing: border-box; 
+            padding: 15px;
+        }
+
+        /* 3. 헤더 */
+        #header {
+            height: 80px; /* 헤더 높이 */
+            width: 100%;
+            position: relative; 
+        }
+
+        /* 4. 메인 영역 (컨테이너) */
+        #main-container {
+            /* 헤더 높이(80px)를 제외한 나머지 화면 전체 높이 */
+            height: calc(100vh - 80px);
+        }
+
+        /* 5. 중앙 컨텐츠 (*** 변경됨 ***) */
+        #main-content {
+            height: 100%; /* 부모(main-container)의 높이를 꽉 채움 */
+            width: 100%;
+        }
+
+        /* (삭제) 사이드바 관련 CSS가 모두 제거되었습니다. */
+
+    </style>
+</head>
+<body>
+
+    <header id="header" class="box">
+        <a href="dashboard.html" style="text-decoration: none; color: black;">
+            <h2>헤더 (상단 바)</h2>
+
+            <a href="Main.html" id="home-button">메인으로</a>
+        </a>
+    </header>
+
+    <div id="main-container">
+
+        <main id="main-content" class="box">
+            <h3>중앙 메인 컨텐츠</h3>
+        </main>
+
+        </div>
+
+</body>
+</html>

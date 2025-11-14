@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SyncDay - 로그인</title>
+    <style>
+        /* CSS 스타일은 이전과 동일합니다 (변경 없음) */
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f4f7f6; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .login-container {
+            background-color: white;
+            padding: 130px 35px; /* (이전 코드에서 130px은 너무 길어서 60px로 조정했습니다) */
+            border-radius: 16px; 
+            border: 1px solid black;
+            width: 340px; 
+            text-align: center; 
+        }
+        h1 {
+            font-size: 32px;
+            font-weight: 700;
+            font-style: italic;
+            margin: 0 0 10px;
+        }
+        h2 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-top: 0;
+            margin-bottom: 30px;
+            color: #333;
+        }
+        .input-field {
+            width: 100%;
+            padding: 12px 15px;
+            margin-bottom: 15px;
+            background-color: #ececec; 
+            border: none;
+            border-radius: 8px;
+            box-sizing: border-box; 
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+        .btn {
+            flex: 1;
+            padding: 10px;
+            background-color: #e0e0e0; 
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            
+            /* (추가) <a> 태그 스타일 통일 */
+            text-decoration: none; /* 밑줄 제거 */
+            color: black;          /* 글자색 통일 */
+            line-height: 1.5;      /* 버튼과 높이 맞춤 (권장) */
+        }
+        .btn:hover {
+            background-color: #d0d0d0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-container">
+        
+        <h1>SyncDay</h1>
+        <h2>LOGIN</h2>
+
+        <form action="#" method="post">
+            
+            <input type="email" class="input-field" placeholder="이메일을 입력하세요" required>
+            
+            <input type="password" class="input-field" placeholder="비밀번호를 입력하세요" required>
+
+            <div class="button-group">
+                <a href="Main.html" class="btn">로그인</a>
+                
+                <a href="Sighup.html" class="btn">회원가입</a>
+
+                </div>
+
+        </form> </div>
+</body>
+</html>

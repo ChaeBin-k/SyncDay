@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SyncDay - 스케줄</title>
+    
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        /* (1. ~ 5. 기존 스타일 동일) */
+        body {
+            background-color: white;
+            margin: 0;
+            font-family: sans-serif;
+            color: black;
+        }
+        .box {
+            background-color: white;
+            border: 1px solid black;
+            box-sizing: border-box; 
+        }
+        #header {
+            height: 80px;
+            width: 100%;
+            position: relative; 
+            padding: 15px;
+        }
+        #main-container {
+            display: flex;
+            min-height: calc(100vh - 80px);
+        }
+        .sidebar {
+            padding: 10px;
+            overflow: hidden;
+            white-space: nowrap;
+            transition: flex-basis 0.3s ease;
+        }
+        #sidebar-right > * { opacity: 0; transition: opacity 0.1s linear; }
+        #sidebar-right:hover > * { opacity: 1; transition: opacity 0.2s linear 0.1s; }
+        #sidebar-right { flex-basis: 60px; }
+        #sidebar-right:hover { flex-basis: 30%; }
+
+        /* 6. 중앙 컨텐츠 (*** 수정됨 ***) */
+        #main-content {
+            flex-basis: 70%; 
+            flex-grow: 1;   
+            padding: 15px; 
+            display: flex;
+            flex-direction: column;
+            
+            /* === (추가) 자식 요소(캘린더)를 가로 중앙에 배치 === */
+            align-items: center;
+        }
+
+        /* 7. 오른쪽 사이드바 (동일) */
+        #sidebar-right h3 { padding: 0 5px 10px 5px; margin: 0; text-align: left; }
+        #sidebar-right p { padding: 0 5px; margin: 10px 0; }
+        
+        /* === 8. 캘린더 스타일 (*** 수정됨 ***) === */
+        #calendar {
+            /* (유지) 화면이 줄어들 때 반응형으로 작아짐 */
+            width: 100%; 
+            
+            /* === (추가) 캘린더의 최대 가로폭을 제한 (이 값을 조절하세요) === */
+            max-width: 900px; 
+            
+            /* (유지) 스크롤을 위한 최소 높이 */
+            min-height: 800px;
+        }
+    </style>
+</head>
+<body>
+
+    <header id="header" class="box">
+        <a href="dashboard.html" style="text-decoration: none; color: black;">
+            <h2>헤더 (상단 바)</h2>
+            <a href="Main.html" id="home-button">메인으로</a>
+        </a>
+    </header>
+    <div id="main-container">
+        <main id="main-content" class="box">
+            <div id="calendar"></div>
+        </main>
+        <aside id="sidebar-right" class="box sidebar">
+            <h3>AI들어갈자리(임시)</h3>
+            <p>정보 1</p>
+            <p>정보 2</p>
+            <p>알림 등이 여기에 표시</p>
+        </aside>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var calendarEl = document.getElementById('calendar');
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                
+                initialView: 'dayGridMonth', 
+                locale: 'ko', 
+                
+                headerToolbar: {
+                    left: 'prev,next today', 
+                    center: 'title', 
+                    right: 'dayGridMonth,dayGridWeek'
+                },
+
+                selectable: true, 
+                height: 'auto', // CSS의 min-height를 따르도록 함
+
+                // (1. 날짜 클릭 - 추가)
+                dateClick: function(info) {
+                    Swal.fire({
+                        title: `"${info.dateStr}" 일정 추가`, 
+                        input: 'text',                      
+                        inputPlaceholder: '일정 제목을 입력하세요...',
+                        showCancelButton: true,             
+                        confirmButtonText: '저장',          
+                        cancelButtonText: '취소',           
+                    }).then((result) => {
+                        if (result.isConfirmed && result.value) {
+                            const title = result.value; 
+                            calendar.addEvent({
+                                title: title,
+                                start: info.dateStr,
+                                allDay: true
+                            });
+                            Swal.fire('저장 완료!', '일정이 성공적으로 추가되었습니다.', 'success');
+                        }
+                    });
+                },
+
+                // (2. 이벤트 클릭 - 수정/삭제)
+                eventClick: function(info) {
+                    Swal.fire({
+                        title: '일정 수정',
+                        input: 'text',
+                        inputValue: info.event.title, 
+                        showCancelButton: true,
+                        confirmButtonText: '수정',
+                        cancelButtonText: '취소',
+                        showDenyButton: true,
+                        denyButtonText: '삭제',
+
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            if (result.value) { 
+                                info.event.setProp('title', result.value);
+                                Swal.fire('수정 완료!', '', 'success');
+                            }
+                        } 
+                        else if (result.isDenied) {
+                            info.event.remove();
+                            Swal.fire('삭제 완료!', '', 'info');
+                        }
+                    });
+                },
+
+                // (3. 기존 이벤트)
+                events: [
+                    {
+                        title: 'SyncDay 캡스톤 회의',
+                        start: '2025-11-14T10:30:00', 
+                        end: '2025-11-14T12:00:00'
+                    },
+                    {
+                        title: 'DB 설계 완료하기',
+                        start: '2025-11-15'
+                    }
+                ]
+            });
+            
+            calendar.render();
+        });
+    </script>
+
+</body>
+</html>

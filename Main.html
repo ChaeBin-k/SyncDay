@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SyncDay - 대시보드 (수정본)</title>
+    
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        /* (1. ~ 6. 스타일은 이전과 동일) */
+        body {
+            background-color: white;
+            margin: 0;
+            font-family: sans-serif;
+            color: black;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .box {
+            background-color: white;
+            border: 1px solid #ddd;
+            box-sizing: border-box; 
+        }
+        #header {
+            height: 80px;
+            width: 100%;
+            position: relative; 
+            padding: 15px;
+            flex-shrink: 0;
+            border-bottom-width: 2px;
+        }
+        #main-container {
+            display: flex;
+            flex-grow: 1;
+            overflow: hidden;
+        }
+        #sidebar-left {
+            flex-basis: 220px;
+            flex-shrink: 0;
+            padding: 15px;
+            border-right: 2px solid #ddd;
+        }
+        #sidebar-left h3 {
+            margin-top: 0;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        #sidebar-left .menu-item {
+            display: block;
+            padding: 12px 10px;
+            margin-bottom: 8px;
+            background-color: #f4f4f4;
+            border-radius: 6px;
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+        }
+        #main-content {
+            flex-grow: 1;
+            padding: 20px;
+            display: flex;
+            gap: 20px;
+            overflow-y: auto;
+        }
+        
+        /* === 7. 오른쪽 사이드바 (*** 수정 ***) === */
+        .sidebar {
+            padding: 10px;
+            overflow: hidden;
+            white-space: nowrap;
+            /* (필수) 애니메이션 */
+            transition: flex-basis 0.3s ease; 
+        }
+        #sidebar-right { 
+            flex-basis: 60px; 
+            flex-shrink: 0;
+            border-left: 2px solid #ddd;
+        }
+        /* (추가) 1. 사이드바 안 움직임 문제 해결 */
+        #sidebar-right:hover { 
+            flex-basis: 30%; 
+        }
+        #sidebar-right > * { 
+            opacity: 0; 
+            transition: opacity 0.1s linear; 
+        }
+        #sidebar-right:hover > * { 
+            opacity: 1; 
+            transition: opacity 0.2s linear 0.1s; 
+        }
+        /* === 수정 끝 === */
+
+
+        /* (8. 대시보드 위젯 스타일 동일) */
+        #dashboard-main {
+            flex-basis: 65%;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        #dashboard-summary {
+            flex-basis: 35%;
+        }
+        .dashboard-widget {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            background-color: #fcfcfc;
+        }
+        .dashboard-widget h3 {
+            margin-top: 0;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        /* === 8-1. 미니 캘린더 (*** 수정 ***) === */
+        #mini-calendar {
+            /* (수정) 3. 달력 크기 문제 (400px -> 550px) */
+            max-width: 550px; 
+            margin: auto;
+        }
+        #mini-calendar .fc-header-toolbar { display: none; }
+        #mini-calendar .fc-daygrid-day { pointer-events: none; }
+        .fc-daygrid-day-events { display: flex; justify-content: center; gap: 3px; }
+        .fc-daygrid-dot-event { padding: 3px; }
+
+        /* (8-2. 할 일 목록 스타일 동일) */
+        #todo-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        #todo-list li {
+            display: flex;
+            align-items: center;
+            padding: 10px 5px;
+            border-bottom: 1px solid #eee;
+        }
+        #todo-list li:last-child { border-bottom: none; }
+        #todo-list input[type="checkbox"] { margin-right: 12px; width: 18px; height: 18px; }
+        #todo-list .due-date {
+            margin-left: auto;
+            font-size: 0.9em;
+            color: #e63946;
+            font-weight: bold;
+        }
+
+        /* (8-3. 루틴 위젯 스타일 동일) */
+        .routine-widget-content {
+            display: flex;
+            align-items: center;
+            gap: 40px; /* 차트와 리스트 간격 (유지) */
+            margin-top: 10px;
+        }
+        #routine-chart-container {
+            position: relative;
+            flex-basis: 180px; 
+            flex-shrink: 0; 
+            margin: 0; 
+        }
+        #routine-chart-percent {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2rem; 
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        /* === 8-3-3. 루틴 리스트 (*** 수정 ***) === */
+        #routine-list {
+            flex-grow: 1;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            
+            /* (추가) 2. 루틴 위젯 너무 큼 문제 해결 */
+            max-height: 160px; /* 리스트 최대 높이 (4줄 정도) */
+            overflow-y: auto;  /* 리스트가 길어지면 스크롤 */
+        }
+        #routine-list li {
+            display: flex;
+            align-items: center;
+            padding: 10px 5px;
+            border-bottom: 1px solid #eee;
+        }
+        #routine-list li:last-child { border-bottom: none; }
+        #routine-list input[type="checkbox"] { margin-right: 12px; width: 18px; height: 18px; }
+    </style>
+</head>
+<body>
+
+    <header id="header" class="box">
+        <h2>헤더 (상단 바)</h2>
+    </header>
+
+    <div id="main-container">
+
+        <nav id="sidebar-left" class="box">
+            <h3>메뉴</h3>
+            <a href="schedule.html" class="menu-item">일정 관리</a>
+            <a href="task.html" class="menu-item">작업 목록</a>
+            <a href="habit.html" class="menu-item">습관 관리</a>
+            <a href="settings.html" class="menu-item">설정</a>
+        </nav>
+
+        <main id="main-content">
+            
+            <section id="dashboard-main">
+                
+                <div class="dashboard-widget">
+                    <h3>미니 캘린더 (일정 확인용)</h3>
+                    <div id="mini-calendar"></div>
+                </div>
+
+                <div class="dashboard-widget">
+                    <h3>오늘의 루틴 달성률</h3>
+                    
+                    <div class="routine-widget-content">
+                        <div id="routine-chart-container">
+                            <canvas id="routine-chart"></canvas>
+                            <div id="routine-chart-percent">75%</div>
+                        </div>
+
+                        <ul id="routine-list">
+                            <li>
+                                <input type="checkbox" id="routine1" checked disabled>
+                                <label for="routine1">아침 7시 기상</label>
+                            </li>
+                            <li>
+                                <input type="checkbox" id="routine2" checked disabled>
+                                <label for="routine2">물 2L 마시기</label>
+                            </li>
+                            <li>
+                                <input type="checkbox" id="routine3" checked disabled>
+                                <label for="routine3">알고리즘 1문제 풀기</label>
+                            </li>
+                            <li>
+                                <input type="checkbox" id="routine4" disabled>
+                                <label for="routine4">스트레칭 10분</label>
+                            </li>
+                            </ul>
+                    </div> 
+                </div> 
+
+            </section>
+
+            <section id="dashboard-summary">
+                <div class="dashboard-widget">
+                    <h3>마감이 임박한 할 일</h3>
+                    <ul id="todo-list">
+                        <li>
+                            <input type="checkbox" id="task1">
+                            <label for="task1">DB 설계 완료하기</label>
+                            <span class="due-date">D-1</span>
+                        </li>
+                        <li>
+                            <input type="checkbox" id="task2">
+                            <label for="task2">캡톤 디자인 발표 자료</label>
+                            <span class="due-date">D-3</span>
+                        </li>
+                        <li>
+                            <input type="checkbox" id="task3" checked>
+                            <label for="task3">팀 회의록 작성</label>
+                            <span class="due-date" style="color: #555;">(완료)</span>
+                        </li>
+                        <li>
+                            <input type="checkbox" id="task4">
+                            <label for="task4">알고리즘 문제 풀기</label>
+                            <span class="due-date">D-3</span>
+                        </li>
+                        <li>
+                            <input type="checkbox" id="task5">
+                            <label for="task5">백엔드 API 명세서 작성</label>
+                            <span class="due-date">D-5</span>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+
+        </main>
+
+        <aside id="sidebar-right" class="box sidebar">
+            <h3>AI 조언</h3>
+            <p>오늘의 팁...</p>
+        </aside>
+
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            // --- 1. 미니 캘린더 (FullCalendar) 초기화 ---
+            var calendarEl = document.getElementById('mini-calendar');
+            var miniCalendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                locale: 'ko',
+                headerToolbar: false, 
+                eventDisplay: 'dot',
+                events: [
+                    { start: '2025-11-14', title: '팀 회의' },
+                    { start: '2025-11-15', title: 'DB 설계' },
+                    { start: '2025-11-17', title: '발표' }
+                ],
+                selectable: false,
+                eventClick: function(info) {
+                    info.jsEvent.preventDefault();
+                }
+            });
+            miniCalendar.render();
+
+            // --- 2. 루틴 달성률 (Chart.js) 초기화 ---
+            var ctx = document.getElementById('routine-chart').getContext('2d');
+            const percent = 75; 
+            var routineChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['달성', '미달성'],
+                    datasets: [{
+                        data: [percent, 100 - percent],
+                        backgroundColor: [ '#007bff', '#e9ecef' ],
+                        borderWidth: 0,
+                        cutout: '80%' 
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { enabled: false }
+                    }
+                }
+            });
+            document.getElementById('routine-chart-percent').innerText = percent + '%';
+        });
+    </script>
+
+</body>
+</html>

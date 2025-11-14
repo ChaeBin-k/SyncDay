@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SyncDay</title>
+    
+    <style>
+        /* 1. 기본 스타일 */
+        body {
+            background-color: white;
+            margin: 0;
+            font-family: sans-serif;
+            color: black;
+        }
+
+        /* 2. 상자 공통 스타일 */
+        .box {
+            background-color: white;
+            border: 1px solid black;
+            box-sizing: border-box; 
+            padding: 15px;
+        }
+
+        /* 3. 헤더 */
+        #header {
+            height: 80px;
+            width: 100%;
+            position: relative; 
+        }
+
+        /* 4. 메인 영역 */
+        #main-container {
+            display: flex;
+            height: calc(100vh - 80px);
+        }
+
+        /* 5. 2단 컬럼 스타일 (*** 변경됨 ***) */
+
+        /* 공통 사이드바 스타일 (오른쪽만 사용) */
+        .sidebar {
+            padding: 10px;
+            overflow: hidden;
+            white-space: nowrap;
+            transition: flex-basis 0.3s ease;
+        }
+
+        /* 오른쪽 사이드바의 자식 요소만 기본 숨김 */
+        #sidebar-right > * {
+            opacity: 0; 
+            transition: opacity 0.1s linear;
+        }
+        
+        /* 오른쪽 사이드바에 마우스를 올렸을 때만 내용 표시 */
+        #sidebar-right:hover > * {
+            opacity: 1; 
+            transition: opacity 0.2s linear 0.1s; 
+        }
+
+        /* 오른쪽 사이드바 (기본/호버) */
+        #sidebar-right { flex-basis: 60px; }
+        #sidebar-right:hover { flex-basis: 30%; }
+
+        /* 중앙 컨텐츠 (flex-grow: 1이 왼쪽 빈 공간을 채움) */
+        #main-content {
+            flex-basis: 70%; /* 기본 70% 차지 */
+            flex-grow: 1;    /* 오른쪽 바가 줄어든 만큼 늘어남 */
+        }
+
+
+        /* 6. 왼쪽 사이드바 메뉴 스타일 (*** 전체 삭제됨 ***) */
+
+
+        /* 7. 오른쪽 사이드바 컨텐츠 스타일 */
+        #sidebar-right h3 {
+            padding: 0 5px 10px 5px;
+            margin: 0;
+            text-align: left;
+        }
+        #sidebar-right p {
+             padding: 0 5px;
+             margin: 10px 0;
+        }
+
+    </style>
+</head>
+<body>
+
+    <header id="header" class="box">
+        <a href="dashboard.html" style="text-decoration: none; color: black;">
+            <h2>-헤더-</h2>
+
+            <a href="Main.html" id="home-button">메인으로</a>
+        </a>
+    </header>
+
+    <div id="main-container">
+
+        <main id="main-content" class="box">
+            <h3>중앙 메인 컨텐츠</h3>
+            <p>컨텐츠 배치 예정</p>
+        </main>
+
+        <aside id="sidebar-right" class="box sidebar">
+            <h3>AI들어갈자리(임시)</h3>
+            <p>정보 1</p>
+            <p>정보 2</p>
+            <p>알림 등이 여기에 표시</p>
+        </aside>
+
+    </div>
+
+</body>
+</html>
